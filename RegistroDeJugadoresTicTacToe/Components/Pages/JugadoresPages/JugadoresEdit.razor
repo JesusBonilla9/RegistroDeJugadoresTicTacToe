@@ -1,0 +1,8 @@
+﻿<PageTitle>Edit de Jugadores</PageTitle>
+@page "/Jugadores/Edit/{JugadorId:int}"
+@inject JugadoresService jugadoresServices
+@rendermode InteractiveServer
+@code {
+    [Parameter]
+    public int JugadorId { get; set; }
+}
