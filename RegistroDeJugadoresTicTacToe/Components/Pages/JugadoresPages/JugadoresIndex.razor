@@ -1,8 +1,122 @@
-﻿<PageTitle>Index de Jugadores</PageTitle>
+﻿@page "/"
 @page "/Jugadores/Index"
-@inject JugadoresService jugadoresServices
+@inject JugadoresService jugadoresService
 @rendermode InteractiveServer
-<h5>Hola mundo!</h5>
-@code {
 
+<PageTitle>Registro de Jugadores</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h5 class="card-title">Registro de Jugadores</h5>
+            <a href="/Jugadores/Create" class="btn btn-primary"> <span class="bi bi-plus-square mt-3"></span> Crear</a>
+        </div>
+
+        <div class="card-body">
+
+            @*labels*@ 
+            <div class="row">
+
+                @*Filtrar por*@ 
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @*ValorFiltro*@ 
+                <div class="col-4">
+                    <label class="col-form-label"><strong>Búsqueda</strong></label>
+                </div>
+            </div>
+
+            @*Inputs y botones*@ 
+            <div class="row align-items-center">
+                @*filtro*@ 
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opción</option>
+                        <option value="Nombres">Nombres</option>
+                        <option value="JugadorId">JugadorId</option>
+                        <option value="Partida">Partidas</option>
+                    </InputSelect>
+                </div>
+
+                @*Busqueda*@ 
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="table  table-striped text-black">
+                    <tr>
+                        <th>JugadorId</th>
+                        <th>Nombres</th>
+                        <th>Partidas</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var jugador in ListaJugadores)
+                    {
+                        <tr>
+                            <td>@jugador.JugadorId</td>
+                            <td>@jugador.Nombre</td>
+                            <td>@jugador.Partida</td>
+                            <td class="text-center">
+                                <a href="/Jugadores/Edit/@jugador.JugadorId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer space-between">
+            <label>Cantidad:  @ListaJugadores.Count()</label>
+            <label>Total Partidas:  @ListaJugadores.Sum(j => j.Partida)</label>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
+    }
+
+    private async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "Nombres")
+            {
+                ListaJugadores = await jugadoresService.Listar(j => j.Nombre.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+            else if (Filtro == "JugadorId" && int.TryParse(ValorFiltro, out var id))
+            {
+                ListaJugadores = await jugadoresService.Listar(j => j.JugadorId == id);
+            }
+            else if (Filtro == "Partida" && int.TryParse(ValorFiltro, out var partida))
+            {
+                ListaJugadores = await jugadoresService.Listar(j => j.Partida == partida);
+            }
+        }
+        else
+        {
+            ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
+        }
+    }
+
+    private async Task Restablecer()
+    {
+        ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
 }
+

@@ -18,7 +18,7 @@ namespace RegistroDeJugadoresTicTacToe.Services
                 return await Modificar(Jugador);
             }
         }
-        private async Task<bool> Existe(int JugadorId)
+        public async Task<bool> Existe(int JugadorId)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Jugadores.AnyAsync(p => p.JugadorId == JugadorId);
