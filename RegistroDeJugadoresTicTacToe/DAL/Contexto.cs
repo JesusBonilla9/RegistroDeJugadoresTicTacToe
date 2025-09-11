@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegistroDeJugadoresTicTacToe.Models;
 
-namespace RegistroDeJugadoresTicTacToe.DAL
+namespace RegistroDeJugadoresTicTacToe.DAL;
+
+public class Contexto : DbContext
 {
-    public class Contexto : DbContext
-    {
-        public Contexto(DbContextOptions<Contexto> options) : base(options) { }
-        public DbSet<Jugadores> Jugadores { get; set; }
-    }
+    public DbSet<Jugadores> Jugadores { get; set; }
+    public Contexto(DbContextOptions<Contexto> options) : base(options) { }
+    
 }

@@ -1,4 +1,4 @@
-using Blazored.Toast;
+
 using Microsoft.EntityFrameworkCore;
 using RegistroDeJugadoresTicTacToe.Components;
 using RegistroDeJugadoresTicTacToe.DAL;
@@ -11,10 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
-builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
+var ConnectionStrings = builder.Configuration.GetConnectionString("SqlConStr");
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConnectionStrings));
 
-builder.Services.AddBlazoredToast();
 builder.Services.AddScoped<JugadoresService>();
 
 
