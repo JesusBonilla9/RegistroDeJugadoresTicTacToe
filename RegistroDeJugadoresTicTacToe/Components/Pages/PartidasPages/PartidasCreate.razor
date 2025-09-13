@@ -128,17 +128,21 @@
     {
         try
         {
-            
             if (Partida.Jugador1Id == Partida.Jugador2Id && Partida.Jugador2Id != 0 && Partida.Jugador2Id != null)
             {
                 Mensaje = "No se puede crear una partida con el mismo jugador dos veces.";
                 return;
             }
 
-            
             if (Partida.FechaFin.HasValue && Partida.FechaFin < Partida.FechaInicio)
             {
                 Mensaje = "La fecha de fin no puede ser anterior a la fecha de inicio.";
+                return;
+            }
+
+            if (Partida.EstadoPartida != "Finalizada" && Partida.GanadorId != null)
+            {
+                Mensaje = "No se puede asignar un ganador si la partida no está Finalizada.";
                 return;
             }
 
@@ -147,6 +151,7 @@
             if (creado)
             {
                 Mensaje = "Partida guardada correctamente";
+                navigationManager.NavigateTo("/Partidas/Index");
             }
             else
             {
@@ -158,6 +163,7 @@
             Mensaje = ex.InnerException?.Message ?? ex.Message;
         }
     }
+
 
 
 
