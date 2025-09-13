@@ -1,5 +1,171 @@
-﻿<h3>PartidasCreate</h3>
+﻿@page "/Partidas/Create"
+
+@inject PartidasService partidasService
+@inject JugadoresService jugadoresService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Crear Partida</PageTitle>
+
+<EditForm Model="Partida" OnValidSubmit="Guardar" FormName="CrearPartidasForm">
+    <DataAnnotationsValidator />
+
+    <div class="container mt-4">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Crear Partida</h5>
+            </div>
+
+            <div class="card-body">
+
+                @* Jugador 1 *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Jugador 1</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Partida.Jugador1Id">
+                        <option value="0">Seleccione un jugador</option>
+                        @foreach (var jugador in ListaJugadores)
+                        {
+                            <option value="@jugador.JugadorId">@jugador.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Partida.Jugador1Id)" />
+                </div>
+
+                @* Jugador 2 (opcional) *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Jugador 2</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Partida.Jugador2Id">
+                        <option value="0">Seleccione un jugador</option>
+                        @foreach (var jugador in ListaJugadores)
+                        {
+                            <option value="@jugador.JugadorId">@jugador.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Partida.Jugador2Id)" />
+                </div>
+
+                @* Estado de la partida *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Estado</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Partida.EstadoPartida">
+                        <option value="En Curso">En Curso</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Pendiente">Pendiente</option>
+                    </InputSelect>
+                    <ValidationMessage For="(() => Partida.EstadoPartida)" />
+                </div>
+
+                @* Turno inicial *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Turno del Jugador</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Partida.TurnoJugadorId">
+                        <option value="0">Seleccione un jugador</option>
+                        @foreach (var jugador in ListaJugadores)
+                        {
+                            <option value="@jugador.JugadorId">@jugador.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Partida.TurnoJugadorId)" />
+                </div>
+
+                @* Estado del tablero *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Estado del Tablero</strong></label>
+                    <InputText class="form-control" @bind-Value="Partida.EstadoTablero" />
+                    <ValidationMessage For="(() => Partida.EstadoTablero)" />
+                </div>
+
+                @* Ganador *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Ganador</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Partida.GanadorId">
+                        <option value="">Sin ganador</option>
+                        @foreach (var jugador in ListaJugadores)
+                        {
+                            <option value="@jugador.JugadorId">@jugador.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Partida.GanadorId)" />
+                </div>
+
+                @* Fecha Fin *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha Fin</strong></label>
+                    <InputDate class="form-control" @bind-Value="Partida.FechaFin" />
+                    <ValidationMessage For="(() => Partida.FechaFin)" />
+                </div>
+
+            </div>
+
+            @* Mostrar mensaje de validación o éxito *@
+            @if (!string.IsNullOrEmpty(Mensaje))
+            {
+                <div class="alert @GetAlertClass()">
+                    @Mensaje
+                </div>
+            }
+
+            @* Footer *@
+            <div class="card-footer text-center mt-3">
+                <a href="/Partidas/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
 
 @code {
+    public Partidas Partida { get; set; } = new Partidas();
+    public string Mensaje { get; set; } = string.Empty;
+    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        ListaJugadores = await jugadoresService.Listar(d => d.JugadorId > 0);
+    }
+
+    public async Task Guardar()
+    {
+        try
+        {
+            // Validar que Jugador1 y Jugador2 no sean el mismo
+            if (Partida.Jugador1Id == Partida.Jugador2Id && Partida.Jugador2Id != 0 && Partida.Jugador2Id != null)
+            {
+                Mensaje = "No se puede crear una partida con el mismo jugador dos veces.";
+                return;
+            }
+
+            // Validar que FechaFin no sea menor que FechaInicio
+            if (Partida.FechaFin.HasValue && Partida.FechaFin < Partida.FechaInicio)
+            {
+                Mensaje = "La fecha de fin no puede ser anterior a la fecha de inicio.";
+                return;
+            }
+
+            var creado = await partidasService.Guardar(Partida);
+
+            if (creado)
+            {
+                Mensaje = "Partida guardada correctamente";
+                navigationManager.NavigateTo("/Partidas/Index");
+            }
+            else
+            {
+                Mensaje = "No se pudo guardar correctamente";
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = ex.InnerException?.Message ?? ex.Message;
+        }
+    }
+
+
+
+    private string GetAlertClass()
+    {
+        return string.IsNullOrEmpty(Mensaje) || Mensaje.Contains("No se pudo") ? "alert-danger" : "alert-success";
+    }
 }
+
+

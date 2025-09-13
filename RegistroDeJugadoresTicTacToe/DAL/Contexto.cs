@@ -34,5 +34,6 @@ public class Contexto : DbContext
         .WithMany()
         .HasForeignKey(p => p.TurnoJugadorId)
         .OnDelete(DeleteBehavior.Restrict);
+        base.OnModelCreating(modelBuilder);
     }
 }
