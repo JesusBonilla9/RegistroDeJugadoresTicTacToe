@@ -10,5 +10,8 @@ public class Jugadores
     public string Nombre { get; set; } = string.Empty;
     [Required(ErrorMessage = "El numero de partidas es obligatorio. ")]
     [Range(0, int.MaxValue, ErrorMessage = "Debe ser un numero valido. ")]
-    public int Partida { get; set; }
+    public int Victorias { get; set; } = 0;
+    public int Derrotas { get; set; } = 0;
+
+    public int Empates { get; set; } = 0;
 }
