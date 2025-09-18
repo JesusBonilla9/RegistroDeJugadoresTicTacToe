@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RegistroDeJugadoresTicTacToe.Models;
 
@@ -14,4 +15,7 @@ public class Jugadores
     public int Derrotas { get; set; } = 0;
 
     public int Empates { get; set; } = 0;
+
+    [InverseProperty(nameof(Models.Movimientos.Jugador))]
+    public virtual ICollection<Movimientos> Movimientos { get; set; } = new List<Movimientos>();
 }
