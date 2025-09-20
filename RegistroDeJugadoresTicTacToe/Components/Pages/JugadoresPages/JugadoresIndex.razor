@@ -1,5 +1,4 @@
-﻿@page "/"
-@page "/Jugadores/Index"
+﻿@page "/Jugadores/Index"
 @inject JugadoresService jugadoresService
 @rendermode InteractiveServer
 
@@ -9,24 +8,26 @@
     <div class="card shadow-lg">
 
         @* Encabezado con título y botón Crear *@
-        <div class="card-header space-between">
-            <h5 class="card-title">Index de Jugadores</h5>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Index de Jugadores</h5>
             <a href="/Jugadores/Create" class="btn btn-primary">
-                <span class="bi bi-plus-square mt-3"></span> Crear
+                <i class="bi bi-plus-square"></i> Crear
             </a>
         </div>
+
 
         <div class="card-body">
             @*Sección de filtros*@
             <div class="row align-items-end mb-3">
-                @*Dropdown de selección de filtro*@
                 <div class="col-3">
                     <label class="form-label"><strong>Filtrar por</strong></label>
                     <InputSelect class="form-select" @bind-Value="Filtro">
                         <option value="" selected disabled>Elija una opción</option>
                         <option value="Nombre">Nombres</option>
                         <option value="JugadorId">JugadorId</option>
-                        <option value="Partida">Partidas</option>
+                        <option value="Victorias">Victorias</option>
+                        <option value="Derrotas">Derrotas</option>
+                        <option value="Empates">Empates</option>
                     </InputSelect>
                 </div>
 
@@ -45,18 +46,21 @@
                     <tr>
                         <th>JugadorId</th>
                         <th>Nombres</th>
-                        <th>Partidas</th>
+                        <th>Victorias</th>
+                        <th>Derrotas</th>
+                        <th>Empates</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
                 <tbody>
-
                     @foreach (var jugador in ListaJugadores)
                     {
                         <tr>
                             <td>@jugador.JugadorId</td>
                             <td>@jugador.Nombre</td>
                             <td>@jugador.Victorias</td>
+                            <td>@jugador.Derrotas</td>
+                            <td>@jugador.Empates</td>
                             <td class="text-center">
                                 <a href="/Jugadores/Edit/@jugador.JugadorId" class="btn btn-outline-primary bi bi-pencil-square"></a>
                             </td>
@@ -67,12 +71,13 @@
         </div>
 
         <div class="card-footer space-between">
-            <label>Cantidad: @ListaJugadores.Count()</label>
-            <label>Total Partidas: @ListaJugadores.Sum(j => j.Victorias)</label>
+            <label>Total Jugadores: @ListaJugadores.Count()</label>
+            <label>Total Victorias: @ListaJugadores.Sum(j => j.Victorias)</label>
+            <label>Total Derrotas: @ListaJugadores.Sum(j => j.Derrotas)</label>
+            <label>Total Empates: @ListaJugadores.Sum(j => j.Empates)</label>
         </div>
     </div>
 </div>
-
 
 @code {
     public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
@@ -98,9 +103,17 @@
             {
                 ListaJugadores = await jugadoresService.Listar(j => j.JugadorId == id);
             }
-            else if (Filtro == nameof(Jugadores.Victorias) && int.TryParse(ValorFiltro, out var partida))
+            else if (Filtro == nameof(Jugadores.Victorias) && int.TryParse(ValorFiltro, out var victorias))
             {
-                ListaJugadores = await jugadoresService.Listar(j => j.Victorias == partida);
+                ListaJugadores = await jugadoresService.Listar(j => j.Victorias == victorias);
+            }
+            else if (Filtro == nameof(Jugadores.Derrotas) && int.TryParse(ValorFiltro, out var derrotas))
+            {
+                ListaJugadores = await jugadoresService.Listar(j => j.Derrotas == derrotas);
+            }
+            else if (Filtro == nameof(Jugadores.Empates) && int.TryParse(ValorFiltro, out var empates))
+            {
+                ListaJugadores = await jugadoresService.Listar(j => j.Empates == empates);
             }
         }
         else
@@ -109,7 +122,6 @@
         }
     }
 
-
     private async Task Restablecer()
     {
         ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
@@ -117,4 +129,5 @@
         ValorFiltro = string.Empty;
     }
 }
+
 

@@ -1,0 +1,100 @@
+﻿@page "/"
+@page "/menu"
+@rendermode InteractiveServer
+@inject NavigationManager navigationManager
+@inject JugadoresService jugadoresService
+@inject PartidasService partidasService
+
+<PageTitle>TicTacToe</PageTitle>
+
+<div class="container mx-auto max-w-lg p-6 bg-white rounded-lg shadow-xl text-center">
+    <div class="game-container">
+        @if (!gameStarted)
+        {
+            <!-- PANTALLA DE SELECCIÓN DE JUGADOR -->
+            <div class="selection-screen">
+                <h1>Selecciona los jugadores</h1>
+
+                <div class="d-flex justify-content-between gap-3 mb-3">
+                    <!-- Jugador X -->
+                    <div class="flex-fill">
+                        <label>Jugador X</label>
+                        <InputSelect class="form-select" @bind-Value="jugador1Id">
+                            <option value="">-- Selecciona --</option>
+                            @foreach (var jugador in jugadoresDisponibles)
+                            {
+                                <option value="@jugador.JugadorId"
+                                        disabled="@(jugador.JugadorId == jugador2Id)">
+                                    @jugador.Nombre
+                                </option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <!-- Jugador O -->
+                    <div class="flex-fill">
+                        <label>Jugador O</label>
+                        <InputSelect class="form-select" @bind-Value="jugador2Id">
+                            <option value="">-- Selecciona --</option>
+                            @foreach (var jugador in jugadoresDisponibles)
+                            {
+                                <option value="@jugador.JugadorId"
+                                        disabled="@(jugador.JugadorId == jugador1Id)">
+                                    @jugador.Nombre
+                                </option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <button class="btn btn-success btn-lg mt-4"
+                        disabled="@(jugador1Id == null || jugador2Id == null)"
+                        @onclick="StartGame">
+                    Iniciar Partida
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private bool gameStarted;
+    private int? jugador1Id;
+    private int? jugador2Id;
+    private List<Jugadores> jugadoresDisponibles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        jugadoresDisponibles = await jugadoresService.Listar(j => true);
+    }
+
+    private async Task StartGame()
+    {
+        if (jugador1Id != null && jugador2Id != null)
+        {
+            var partida = new Partidas
+            {
+                Jugador1Id = jugador1Id.Value,
+                Jugador2Id = jugador2Id.Value,
+                EstadoPartida = "En Curso",
+                TurnoJugadorId = jugador1Id.Value,
+                EstadoTablero = "---------",
+                FechaInicio = DateTime.Now
+            };
+
+            await partidasService.Guardar(partida);
+
+            gameStarted = true;
+            navigationManager.NavigateTo($"/tablero?PartidaId={partida.PartidaId}&Jugador1Id={jugador1Id}&Jugador2Id={jugador2Id}");
+        }
+    }
+
+    private void RestartGame()
+    {
+        gameStarted = false;
+        jugador1Id = null;
+        jugador2Id = null;
+    }
+}
+
+

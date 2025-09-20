@@ -50,6 +50,7 @@
                     <InputSelect class="form-control" @bind-Value="Partida.EstadoPartida">
                         <option value="En Curso">En Curso</option>
                         <option value="Finalizada">Finalizada</option>
+                        <option value="Empatada"> Empatada</option>
                         <option value="Pendiente">Pendiente</option>
                     </InputSelect>
                     <ValidationMessage For="(() => Partida.EstadoPartida)" />
@@ -116,6 +117,7 @@
                 </a>
                 <button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
                 <button type="button" class="btn btn-danger bi bi-trash" @onclick="MostrarModalEliminar"> Eliminar</button>
+
             </div>
         </div>
     </div>
@@ -210,6 +212,13 @@
     {
         try
         {
+            var p = await partidasService.Buscar(PartidaId);
+            if (p is null) return;
+
+            if (p.EstadoPartida == "Finalizada" || p.EstadoPartida == "Empatada")
+            {
+                await jugadoresService.RevertirEstadisticasPartida(p.Jugador1Id, p.Jugador2Id.Value, p.GanadorId);
+            }
             var eliminado = await partidasService.Eliminar(Partida.PartidaId);
 
             if (eliminado)

@@ -23,13 +23,6 @@
                     <InputText class="form-control" @bind-Value="Jugador.Nombre" />
                     <ValidationMessage For="(() => Jugador.Nombre)" />
                 </div>
-
-                @* Partidas *@
-                <div class="mb-3">
-                    <label class="form-label"><strong>Partidas</strong></label>
-                    <InputNumber class="form-control" @bind-Value="Jugador.Victorias" />
-                    <ValidationMessage For="(() => Jugador.Victorias)" />
-                </div>
             </div>
 
             @* Mostrar mensaje de éxito o error *@

@@ -64,5 +64,55 @@ public class JugadoresService(IDbContextFactory<Contexto> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Jugadores.Where(criterio).AsNoTracking().ToListAsync();
     }
+
+    public async Task ActualizarEstadisticasFinPartida(int jugador1Id, int jugador2Id, int? ganadorId)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var j1 = await contexto.Jugadores.FindAsync(jugador1Id);
+        var j2 = await contexto.Jugadores.FindAsync(jugador2Id);
+        if (j1 is null || j2 is null) return;
+
+        if (ganadorId == null)
+        {
+            j1.Empates++; j2.Empates++;
+        }
+        else if (ganadorId == jugador1Id)
+        {
+            j1.Victorias++; j2.Derrotas++;
+        }
+        else if (ganadorId == jugador2Id)
+        {
+            j2.Victorias++; j1.Derrotas++;
+        }
+
+        await contexto.SaveChangesAsync();
+    }
+    public async Task RevertirEstadisticasPartida(int jugador1Id, int jugador2Id, int? ganadorId)
+    {
+        await using var ctx = await DbFactory.CreateDbContextAsync();
+        var j1 = await ctx.Jugadores.FindAsync(jugador1Id);
+        var j2 = await ctx.Jugadores.FindAsync(jugador2Id);
+        if (j1 is null || j2 is null) return;
+
+        if (ganadorId == null)
+        {
+            if (j1.Empates > 0) j1.Empates--;
+            if (j2.Empates > 0) j2.Empates--;
+        }
+        else if (ganadorId == jugador1Id)
+        {
+            if (j1.Victorias > 0) j1.Victorias--;
+            if (j2.Derrotas > 0) j2.Derrotas--;
+        }
+        else if (ganadorId == jugador2Id)
+        {
+            if (j2.Victorias > 0) j2.Victorias--;
+            if (j1.Derrotas > 0) j1.Derrotas--;
+        }
+
+        await ctx.SaveChangesAsync();
+    }
+
+
 }
 
