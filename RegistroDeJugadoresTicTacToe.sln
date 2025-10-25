@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadoresTicTacTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadoresTicTacToe.BlazorWasm", "RegistroDeJugadoresTicTacToe.BlazorWasm\RegistroDeJugadoresTicTacToe.BlazorWasm.csproj", "{B3DE3D44-B00E-4936-90D3-76736B4CBF82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadoresTicTacToe.Shared", "RegistroDeJugadoresTicTacToe.Shared\RegistroDeJugadoresTicTacToe.Shared.csproj", "{F1D87262-15DB-4095-886F-C29F3B2C242D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
