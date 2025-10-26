@@ -5,8 +5,6 @@ VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadoresTicTacToe", "RegistroDeJugadoresTicTacToe\RegistroDeJugadoresTicTacToe.csproj", "{F9E8F45A-056A-40C2-AA31-34B64F0AF11D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadoresTicTacToe.BlazorWasm", "RegistroDeJugadoresTicTacToe.BlazorWasm\RegistroDeJugadoresTicTacToe.BlazorWasm.csproj", "{B3DE3D44-B00E-4936-90D3-76736B4CBF82}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadoresTicTacToe.Shared", "RegistroDeJugadoresTicTacToe.Shared\RegistroDeJugadoresTicTacToe.Shared.csproj", "{F1D87262-15DB-4095-886F-C29F3B2C242D}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{F9E8F45A-056A-40C2-AA31-34B64F0AF11D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9E8F45A-056A-40C2-AA31-34B64F0AF11D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9E8F45A-056A-40C2-AA31-34B64F0AF11D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B3DE3D44-B00E-4936-90D3-76736B4CBF82}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1D87262-15DB-4095-886F-C29F3B2C242D}.Release|Any CPU.ActiveCfg = Release|Any CPU

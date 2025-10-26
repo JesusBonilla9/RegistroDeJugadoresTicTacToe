@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 namespace RegistroDeJugadoresTicTacToe.Shared.DTOs;
 
 public record MovimientoResponse(
-    int MovimientoId,
-    int PartidaId,
-    int JugadorId,
-    int PosicionColumna,
-    int PosicionFila
+     int MovimientoId,
+     string Jugador, 
+     int PosicionFila, 
+     int PosicionColumna 
 );
