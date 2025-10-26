@@ -32,9 +32,9 @@ namespace RegistroDeJugadoresTicTacToe.Services
             }
         }
 
-        public async Task<Resource<JugadorResponse>> PostJugador(string nombres, string email)
+        public async Task<Resource<JugadorResponse>> PostJugador(string nombre, string email)
         {
-            var request = new JugadorRequest(nombres, email);
+            var request = new JugadorRequest(nombre, email);
             try
             {
                 var response = await httpClient.PostAsJsonAsync("api/Jugadores", request);

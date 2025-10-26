@@ -7,6 +7,6 @@ namespace RegistroDeJugadoresTicTacToe.Services
     {
         Task<Resource<List<JugadorResponse>>> GetJugadoresAsync();
         Task<Resource<JugadorResponse>> GetJugadorAsync(int jugadorId);
-        Task<Resource<JugadorResponse>> PostJugador(string nombres, string email);
+        Task<Resource<JugadorResponse>> PostJugador(string nombre, string email);
     }
 }
