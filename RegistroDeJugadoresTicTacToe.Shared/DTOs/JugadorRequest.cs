@@ -8,6 +8,6 @@ namespace RegistroDeJugadoresTicTacToe.Shared.DTOs;
 
 public record JugadorRequest
 (
-    string Nombre,
+    string Nombres,
     string Email
 );

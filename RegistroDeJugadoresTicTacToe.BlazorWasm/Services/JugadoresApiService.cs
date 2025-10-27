@@ -1,6 +1,7 @@
-﻿using RegistroDeJugadoresTicTacToe.Models;
+﻿
 using RegistroDeJugadoresTicTacToe.Shared;
 using RegistroDeJugadoresTicTacToe.Shared.DTOs;
+using System.Net.Http.Json;
 
 namespace RegistroDeJugadoresTicTacToe.Services
 {

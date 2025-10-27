@@ -11,10 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-//var ConnectionStrings = builder.Configuration.GetConnectionString("SqlConStr");
-//builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConnectionStrings));
-
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/") });
+var ConnectionStrings = builder.Configuration.GetConnectionString("SqlConStr");
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConnectionStrings));
 
 builder.Services.AddScoped<JugadoresService>();
 builder.Services.AddScoped<PartidasService>();

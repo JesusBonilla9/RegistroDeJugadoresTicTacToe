@@ -20,8 +20,4 @@
     <Folder Include="Components\Pages\Registros\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\RegistroDeJugadoresTicTacToe.Shared\RegistroDeJugadoresTicTacToe.Shared.csproj" />
-  </ItemGroup>
-
 </Project>
