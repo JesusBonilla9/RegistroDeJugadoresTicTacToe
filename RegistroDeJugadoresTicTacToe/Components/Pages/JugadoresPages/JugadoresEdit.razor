@@ -1,96 +1,66 @@
 ﻿@page "/Jugadores/Edit/{JugadorId:int}"
-
-@inject JugadoresService jugadoresService
+@inject IJugadoresApiService jugadoresApiService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
-<PageTitle>Modificar Jugador</PageTitle>
+<PageTitle>Editar Jugador</PageTitle>
 
-<EditForm Model="Jugador" OnValidSubmit="Modificar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h5 class="card-title">Crear Jugador</h5>
+        </div>
 
-    <div class="container">
-        <div class="card shadow-lg">
-            <div class="card-header text-center">
-                <h5 class="card-title">Modificar Jugador</h5>
+        <div class="card-body">
+
+            @* Nombre *@
+            <div class="mb-3">
+                <label class="form-label"><strong>Nombre</strong></label>
+                <InputText class="form-control" @bind-Value="Nombres" />
             </div>
-
-            <div class="card-body">
-                @* Nombre *@
-                <div class="mb-3">
-                    <label class="form-label"><strong>Nombre</strong></label>
-                    <InputText class="form-control" @bind-Value="Jugador.Nombre" />
-                    <ValidationMessage For="(() => Jugador.Nombre)" />
-                </div>
-            </div>
-
-            @* Mostrar mensaje de éxito o error *@
-            @if (!string.IsNullOrEmpty(Mensaje))
-            {
-                <div class="alert @GetAlertClass()">
-                    @Mensaje
-                </div>
-            }
-
-            @* Footer *@
-            <div class="card-footer text-center mt-2">
-                <a href="/Jugadores/Index" class="btn btn-secondary">
-                    <span class="bi bi-arrow-left"></span> Volver
-                </a>
-                <button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
-                <button type="button" class="btn btn-danger bi bi-trash" @onclick="MostrarModalEliminar"> Eliminar</button>
+            @* Email *@
+            <div class="mb-3">
+                <label class="form-label"><strong>Email</strong></label>
+                <InputText class="form-control" @bind-Value="Email" />
             </div>
         </div>
-    </div>
-</EditForm>
 
-@* Modal de confirmación de eliminación *@
-@if (MostrarModal)
-{
-    <div class="modal show" tabindex="-1" style="display: block;" aria-labelledby="confirmDeleteModalLabel" aria-hidden="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" aria-label="Close" @onclick="CerrarModalEliminar"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar al jugador?</p>
-                    <p><strong>JugadorId:</strong> @Jugador.JugadorId</p>
-                    <p><strong>Nombre:</strong> @Jugador.Nombre</p>
-                    <p><strong>Partidas:</strong> @Jugador.Victorias</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CerrarModalEliminar">Volver</button>
-                    <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
-                </div>
+        @* Mostrar mensaje de validación o éxito *@
+        @if (!string.IsNullOrEmpty(Mensaje))
+        {
+            <div class="alert @GetAlertClass()">
+                @Mensaje
             </div>
+        }
+
+        @* Footer *@
+        <div class="card-footer text-center mt-3">
+            <a href="/Jugadores/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+            <button type="button" class="btn btn-primary bi bi-floppy" @onclick="Modificar"> Modificar</button>
         </div>
     </div>
-}
+</div>
 
 @code {
     [Parameter]
     public int JugadorId { get; set; }
-
-    public Jugadores Jugador { get; set; } = new Jugadores();
     public string Mensaje { get; set; } = string.Empty;
-
-    private bool MostrarModal { get; set; } = false;
-
+    public string Nombres { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     protected override async Task OnInitializedAsync()
     {
-        Jugador = await jugadoresService.Buscar(JugadorId);
+        var Jugador = await jugadoresApiService.GetJugadoresAsync(JugadorId);
+        Nombres = Jugador.Data.Nombres;
+        Email = Jugador.Data.Email;
     }
 
     public async Task Modificar()
     {
         try
         {
-            var modificado = await jugadoresService.Guardar(Jugador);
+            var modificado = await jugadoresApiService.PutJugador(JugadorId, Nombres, Email);
 
-            if (modificado)
+            if (modificado is Resource<JugadorResponse>.Success ok)
             {
                 Mensaje = "Se ha modificado correctamente";
                 navigationManager.NavigateTo("/Jugadores/Index");
@@ -104,39 +74,6 @@
         {
             Mensaje = $"Error: {ex.Message}";
         }
-    }
-
-    private async Task Eliminar()
-    {
-        try
-        {
-            var eliminado = await jugadoresService.Eliminar(Jugador.JugadorId);
-
-            if (eliminado)
-            {
-                Mensaje = "Se ha eliminado correctamente";
-                navigationManager.NavigateTo("/Jugadores/Index");
-            }
-            else
-            {
-                Mensaje = "No se ha podido eliminar correctamente";
-            }
-            CerrarModalEliminar(); 
-        }
-        catch (Exception ex)
-        {
-            Mensaje = $"Error: {ex.Message}";
-        }
-    }
-
-    private void MostrarModalEliminar()
-    {
-        MostrarModal = true; 
-    }
-
-    private void CerrarModalEliminar()
-    {
-        MostrarModal = false; 
     }
 
     private string GetAlertClass()
