@@ -8,5 +8,5 @@ namespace RegistroDeJugadoresTicTacToe.DTOs;
 
 public record PartidaRequest(
     int Jugador1Id,
-    int Jugador2Id
+    int? Jugador2Id
 );
