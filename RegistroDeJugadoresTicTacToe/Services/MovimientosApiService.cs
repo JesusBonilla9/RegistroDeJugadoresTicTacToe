@@ -9,7 +9,7 @@ public class MovimientosApiService(HttpClient httpClient) : IMovimientosApiServi
     {
         try
         {
-            var response = await httpClient.GetFromJsonAsync<List<MovimientoResponse>>($"api/Movimientos{partidaId}");
+            var response = await httpClient.GetFromJsonAsync<List<MovimientoResponse>>($"api/Movimientos/{partidaId}");
             return new Resource<List<MovimientoResponse>>.Success(response ?? []);
         }
         catch (Exception ex)
@@ -25,8 +25,7 @@ public class MovimientosApiService(HttpClient httpClient) : IMovimientosApiServi
         {
             var response = await httpClient.PostAsJsonAsync("api/Movimientos", request);
             response.EnsureSuccessStatusCode();
-            var created = await response.Content.ReadFromJsonAsync<MovimientoResponse>();
-            return new Resource<MovimientoResponse>.Success(created!);
+            return new Resource<MovimientoResponse>.Success(null!);
         }
         catch (HttpRequestException ex)
         {
