@@ -2,10 +2,7 @@
 using RegistroDeJugadoresTicTacToe.DAL;
 using RegistroDeJugadoresTicTacToe.Models;
 using System.Linq.Expressions;
-
 namespace RegistroDeJugadoresTicTacToe.Services;
-
-
 public class PartidasService(IDbContextFactory<Contexto> DbFactory)
 {
     public async Task<bool> Guardar(Partidas partida)

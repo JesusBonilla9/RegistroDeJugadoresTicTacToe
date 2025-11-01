@@ -1,13 +1,10 @@
 ﻿@page "/Jugadores/Create"
 
-@inject JugadoresService jugadoresService
+@inject IJugadoresApiService jugadoresApiService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Crear Jugador</PageTitle>
-
-<EditForm Model="Jugador" OnValidSubmit="Guardar" FormName="CrearJugadoresForm">
-    <DataAnnotationsValidator />
 
     <div class="container mt-4">
         <div class="card shadow-lg">
@@ -20,8 +17,12 @@
                 @* Nombre *@
                 <div class="mb-3">
                     <label class="form-label"><strong>Nombre</strong></label>
-                    <InputText class="form-control" @bind-Value="Jugador.Nombre" />
-                    <ValidationMessage For="(() => Jugador.Nombre)" />
+                    <InputText class="form-control" @bind-Value="Nombres"/>
+                </div>
+                @* Email *@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Email</strong></label>
+                    <InputText class="form-control" @bind-Value="Email"/>
                 </div>
             </div>
 
@@ -36,29 +37,24 @@
             @* Footer *@
             <div class="card-footer text-center mt-3">
                 <a href="/Jugadores/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
-                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+                <button type="button" class="btn btn-primary bi bi-floppy" @onclick="Guardar"> Guardar</button>
             </div>
         </div>
     </div>
-</EditForm>
+
 
 @code {
-    public Jugadores Jugador { get; set; } = new Jugadores();
+    public string Nombres { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public string Mensaje { get; set; } = string.Empty;
-    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
-
-    protected override async Task OnInitializedAsync()
-    {
-        ListaJugadores = await jugadoresService.Listar(d => d.JugadorId > 0);
-    }
 
     public async Task Guardar()
     {
         try
         {
-            var creado = await jugadoresService.Guardar(Jugador);
+            var creado = await jugadoresApiService.PostJugadores(Nombres, Email);
 
-            if (creado)
+            if (creado is Resource<JugadorResponse>.Success ok)
             {
                 Mensaje = "Jugador Guardado Correctamente";
                 navigationManager.NavigateTo("/Jugadores/Index");

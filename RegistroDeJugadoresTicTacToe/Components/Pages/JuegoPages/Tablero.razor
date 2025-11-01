@@ -1,11 +1,13 @@
-﻿@page "/tablero"
+﻿@page "/tablero/{PartidaId:int}"
 @using RegistroDeJugadoresTicTacToe.Models
-@inject JugadoresService jugadoresService
-@inject PartidasService partidasService
-@inject MovimientosService movimientosService
+@inject NavigationManager navigationManager
+@inject IJugadoresApiService jugadoresApiService
+@inject IPartidaApiService partidasApiService
+@inject IMovimientosApiService movimientosApiService
 @rendermode InteractiveServer
 
 <div class="game-container">
+    <div class="text">PartidaID: @PartidaId</div>
     <h2 class="game-status">@GameStatus</h2>
     <div class="game-screen">
         <div class="game-board">
@@ -28,10 +30,9 @@
 
 @code {
     private enum PlayerType { X, O }
-
-    [SupplyParameterFromQuery] public int PartidaId { get; set; }
-    [SupplyParameterFromQuery] public int Jugador1Id { get; set; }
-    [SupplyParameterFromQuery] public int Jugador2Id { get; set; }
+    [Parameter]
+    public int PartidaId { get; set; }
+    
 
     private string? jugador1Nombre;
     private string? jugador2Nombre;
@@ -44,13 +45,26 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var jugadores = await jugadoresService.Listar(j => j.JugadorId == Jugador1Id || j.JugadorId == Jugador2Id);
-        jugador1Nombre = jugadores.FirstOrDefault(j => j.JugadorId == Jugador1Id)?.Nombre ?? "Jugador X";
-        jugador2Nombre = jugadores.FirstOrDefault(j => j.JugadorId == Jugador2Id)?.Nombre ?? "Jugador O";
-
-        partida = await partidasService.Buscar(PartidaId) ?? new Partidas();
+        await CargarTablero();
+        winner = CheckForWinner();
+        esEmpate = board.All(cell => cell != null);
+        await CargarNombres();
     }
-
+    public async Task CargarTablero()
+    {
+        var movimientos = await movimientosApiService.GetMovimientoAsync(PartidaId);
+        foreach(var m in movimientos.Data)
+        {
+            board[(m.PosicionFila * 3) + m.PosicionColumna] = Enum.Parse<PlayerType>(m.Jugador);
+            _currentPlayerType = Enum.Parse<PlayerType>(m.Jugador) == PlayerType.X ? PlayerType.O : PlayerType.X;
+        }
+    }
+    public async Task CargarNombres()
+    {
+        var partida = (await partidasApiService.GetPartidaAsync(PartidaId)).Data;
+        jugador1Nombre = (await jugadoresApiService.GetJugadoresAsync(partida.Jugador1Id)).Data.Nombres;
+        jugador2Nombre = (await jugadoresApiService.GetJugadoresAsync(partida.Jugador2Id ?? 0)).Data.Nombres;
+    }
     private string GameStatus
     {
         get
@@ -73,52 +87,18 @@
 
         board[index] = _currentPlayerType;
 
-        // GUARDAR MOVIMIENTO
-        var fila = index / 3;
-        var columna = index % 3;
-        var jugadorActualId = (_currentPlayerType == PlayerType.X) ? Jugador1Id : Jugador2Id;
 
-        var movimiento = new Movimientos
-        {
-            PartidaId = PartidaId,
-            JugadorId = jugadorActualId,
-            PosicionFila = fila,
-            PosicionColumna = columna,
-            FechaMovimiento = DateTime.Now
-        };
-
-        await movimientosService.Guardar(movimiento);
-
-        // ACTUALIZAR ESTADO DE PARTIDA
-        partida.EstadoTablero = string.Concat(board.Select(c => c?.ToString() ?? "-"));
-        partida.TurnoJugadorId = (_currentPlayerType == PlayerType.X) ? Jugador2Id : Jugador1Id;
-        await partidasService.Guardar(partida);
-
+        await movimientosApiService.PostMovimiento(PartidaId, _currentPlayerType.ToString(), index/3, index % 3);
         
         winner = CheckForWinner();
         if (winner != null)
         {
-            partida.EstadoPartida = "Finalizada";
-            partida.GanadorId = (winner == PlayerType.X) ? Jugador1Id : Jugador2Id;
-            partida.FechaFin = DateTime.Now;
-
-            await jugadoresService.ActualizarEstadisticasFinPartida(Jugador1Id, Jugador2Id, partida.GanadorId);
-
-            await partidasService.Guardar(partida);
             return;
         }
 
-        
         esEmpate = board.All(cell => cell != null);
         if (esEmpate)
         {
-            partida.EstadoPartida = "Empatada";
-            partida.GanadorId = null;
-            partida.FechaFin = DateTime.Now;
-
-            await jugadoresService.ActualizarEstadisticasFinPartida(Jugador1Id, Jugador2Id, null);
-
-            await partidasService.Guardar(partida);
             return;
         }
         _currentPlayerType = (_currentPlayerType == PlayerType.X) ? PlayerType.O : PlayerType.X;
@@ -143,12 +123,16 @@
         return null;
     }
 
-    private void RestartGame()
+    private async Task RestartGame()
     {
-        board = new PlayerType?[9];
-        _currentPlayerType = PlayerType.X;
-        winner = null;
-        esEmpate = false;
+        var partida = await partidasApiService.GetPartidaAsync(PartidaId);
+        int jugador1Id = partida.Data.Jugador1Id;
+        int? jugador2Id = partida.Data.Jugador2Id;
+        var creado = await partidasApiService.PostPartida(jugador1Id, jugador2Id);
+        if (creado is Resource<PartidaResponse>.Success ok)
+        {
+            navigationManager.NavigateTo($"/tablero/{ok.Data.PartidaId}");
+        }
     }
 
     private string GetPlayerClass(PlayerType? player)
